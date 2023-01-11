@@ -1,0 +1,359 @@
+Bitte erstelle eine Web-App mit HTML und JS für das "Conway game of life" Spiel.
+Die App soll einen Start, Stop, CLear und Generate Button zur Starten und Stoppen des Spiels und zum Löschen und zufälligen Erzeugung einer Verteilung besitzen.
+Die Zelle sollen auch durch Maus-Klicken ein oder ausgeschaltet werden.
+Schön wäre auch ein Slider der die Spiel-Entwicklungsgeschwindigkeit regelt.
+Verwende CSS für ein ansprechendes Design.
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Conway Game of Life Web-App</title>
+    <style>
+      .game-board {
+        display: grid;
+        grid-template-columns: repeat(25, 20px);
+        grid-template-rows: repeat(25, 20px);
+        justify-items: center;
+        align-items: center;
+      }
+
+      .game-board .cell {
+        background-color: #000;
+      }
+
+      .game-board .cell.alive {
+        background-color: #f00;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Conway Game of Life App</h1>
+    <div class="game-board">
+      <!-- Cells will be generated here -->
+    </div>
+
+    <div class="controls">
+      <button id="start">Start</button>
+      <button id="stop">Stop</button>
+      <button id="clear">Clear</button>
+      <button id="generate">Generate</button>
+
+      <label>Speed:</label>
+      <input type="range" id="speed" min="0" max="100" value="50">
+    </div>
+    <script>
+      const board = document.querySelector('.game-board');
+      const cells = [];
+      let running = null;
+      let speed = 50;
+
+      // Generate cells
+      for (let i = 0; i < 25; i++) {
+        cells[i] = [];
+        for (let j = 0; j < 25; j++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.x = j;
+          cell.dataset.y = i;
+          board.appendChild(cell);
+          cells[i].push(cell);
+        }
+      }
+
+      // Click to toggle cell
+      board.addEventListener('click', (event) => {
+        if (event.target.className === 'cell') {
+          event.target.classList.toggle('alive');
+        }
+      });
+
+      // Start/stop the game
+      document.querySelector('#start').addEventListener('click', start);
+      document.querySelector('#stop').addEventListener('click', stop);
+
+      // Clear all cells
+      document.querySelector('#clear').addEventListener('click', clear);
+
+      // Generate random pattern
+      document.querySelector('#generate').addEventListener('click', generate);
+
+      // Set speed
+      document.querySelector('#speed').addEventListener('change', (event) => {
+        speed = event.target.value;
+      });
+
+      // Start the game
+      function start() {
+        if (running === null) {
+          running = setInterval(update, 1000 - (speed * 9));
+        }
+      }
+
+      // Stop the game
+      function stop() {
+        if (running !== null) {
+          clearInterval(running);
+          running = null;
+        }
+      }
+
+      // Clear all cells
+      function clear() {
+        stop();
+        cells.forEach((row) => {
+          row.forEach((cell) => {
+            cell.classList.remove('alive');
+          });
+        });
+      }
+
+      // Generate random pattern
+      function generate() {
+        clear();
+        cells.forEach((row) => {
+          row.forEach((cell) => {
+            if (Math.random() > 0.7) {
+              cell.classList.add('alive');
+            }
+          });
+        });
+      }
+
+      // Update cell states
+      function update() {
+        const nextGeneration = [];
+        cells.forEach((row, y) => {
+          nextGeneration[y] = [];
+          row.forEach((cell, x) => {
+            const alive = cell.classList.contains('alive');
+            let neighbours = 0;
+
+            // Count neighbours
+            for (let i = -1; i <= 1; i++) {
+              for (let j = -1; j <= 1; j++) {
+                if (i === 0 && j === 0) {
+                  continue;
+                }
+
+                const x2 = x + i;
+                const y2 = y + j;
+
+                if (x2 >= 0 && x2 < row.length && y2 >= 0 && y2 < cells.length) {
+                  const cell2 = cells[y2][x2];
+                  if (cell2.classList.contains('alive')) {
+                    neighbours++;
+                  }
+                }
+              }
+            }
+
+            // Set cell state
+            let nextCellState = false;
+            if (alive) {
+              if (neighbours === 2 || neighbours === 3) {
+                nextCellState = true;
+              }
+            } else {
+              if (neighbours === 3) {
+                nextCellState = true;
+              }
+            }
+
+            nextGeneration[y][x] = nextCellState;
+          });
+        });
+
+        // Update DOM
+        nextGeneration.forEach((row, y) => {
+          row.forEach((nextCellState, x) => {
+            const cell = cells[y][x];
+            if (nextCellState) {
+              cell.classList.add('alive');
+            } else {
+              cell.classList.remove('alive');
+            }
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
+
+Bitte korrigieren, es werden keine Zellen angezeigt.
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Conway Game of Life Web-App</title>
+    <style>
+      .game-board {
+        display: grid;
+        grid-template-columns: repeat(25, 20px);
+        grid-template-rows: repeat(25, 20px);
+        justify-items: center;
+        align-items: center;
+      }
+
+      .game-board .cell {
+        background-color: #000;
+        width: 20px;
+        height: 20px;
+      }
+
+      .game-board .cell.alive {
+        background-color: #f00;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Conway Game of Life App</h1>
+    <div class="game-board">
+      <!-- Cells will be generated here -->
+    </div>
+
+    <div class="controls">
+      <button id="start">Start</button>
+      <button id="stop">Stop</button>
+      <button id="clear">Clear</button>
+      <button id="generate">Generate</button>
+
+      <label>Speed:</label>
+      <input type="range" id="speed" min="0" max="100" value="50">
+    </div>
+    <script>
+      const board = document.querySelector('.game-board');
+      const cells = [];
+      let running = null;
+      let speed = 50;
+
+      // Generate cells
+      for (let i = 0; i < 25; i++) {
+        cells[i] = [];
+        for (let j = 0; j < 25; j++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.x = j;
+          cell.dataset.y = i;
+          board.appendChild(cell);
+          cells[i].push(cell);
+        }
+      }
+
+      // Click to toggle cell
+      board.addEventListener('click', (event) => {
+        if (event.target.className === 'cell') {
+          event.target.classList.toggle('alive');
+        }
+      });
+
+      // Start/stop the game
+      document.querySelector('#start').addEventListener('click', start);
+      document.querySelector('#stop').addEventListener('click', stop);
+
+      // Clear all cells
+      document.querySelector('#clear').addEventListener('click', clear);
+
+      // Generate random pattern
+      document.querySelector('#generate').addEventListener('click', generate);
+
+      // Set speed
+      document.querySelector('#speed').addEventListener('change', (event) => {
+        speed = event.target.value;
+      });
+
+      // Start the game
+      function start() {
+        if (running === null) {
+          running = setInterval(update, 1000 - (speed * 9));
+        }
+      }
+
+      // Stop the game
+      function stop() {
+        if (running !== null) {
+          clearInterval(running);
+          running = null;
+        }
+      }
+
+      // Clear all cells
+      function clear() {
+        stop();
+        cells.forEach((row) => {
+          row.forEach((cell) => {
+            cell.classList.remove('alive');
+          });
+        });
+      }
+
+      // Generate random pattern
+      function generate() {
+        clear();
+        cells.forEach((row) => {
+          row.forEach((cell) => {
+            if (Math.random() > 0.7) {
+              cell.classList.add('alive');
+            }
+          });
+        });
+      }
+
+      // Update cell states
+      function update() {
+        const nextGeneration = [];
+        cells.forEach((row, y) => {
+          nextGeneration[y] = [];
+          row.forEach((cell, x) => {
+            const alive = cell.classList.contains('alive');
+            let neighbours = 0;
+
+            // Count neighbours
+            for (let i = -1; i <= 1; i++) {
+              for (let j = -1; j <= 1; j++) {
+                if (i === 0 && j === 0) {
+                  continue;
+                }
+
+                const x2 = x + i;
+                const y2 = y + j;
+
+                if (x2 >= 0 && x2 < row.length && y2 >= 0 && y2 < cells.length) {
+                  const cell2 = cells[y2][x2];
+                  if (cell2.classList.contains('alive')) {
+                    neighbours++;
+                  }
+                }
+              }
+            }
+
+            // Set cell state
+            let nextCellState = false;
+            if (alive) {
+              if (neighbours === 2 || neighbours === 3) {
+                nextCellState = true;
+              }
+            } else {
+              if (neighbours === 3) {
+                nextCellState = true;
+              }
+            }
+
+            nextGeneration[y][x] = nextCellState;
+          });
+        });
+
+        // Update DOM
+        nextGeneration.forEach((row, y) => {
+          row.forEach((nextCellState, x) => {
+            const cell = cells[y][x];
+            if (nextCellState) {
+              cell.classList.add('alive');
+            } else {
+              cell.classList.remove('alive');
+            }
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

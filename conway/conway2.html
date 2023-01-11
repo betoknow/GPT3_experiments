@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Conway's Game Of Life</title>
+    <style>
+      body {
+        background-color: #f2f2f2;
+      }
+
+      #game-canvas {
+        margin: 0 auto;
+        display: block;
+        border: 1px solid #999999;
+        background-color: #ffffff;
+      }
+
+      #controls {
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      .button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+    </style>
+    <script type="text/javascript">
+      // Define game constants
+      const ROWS = 50;
+      const COLS = 50;
+      const CELL_SIZE = 10;
+      // Variable to store the state of each cell
+      var board;
+      // Canvas element reference
+      var canvas;
+      // Define context
+      var ctx;
+      // Variable to store the setInterval
+      var gameInterval;
+
+      // Initialize all the variables
+      function init() {
+        board = new Array(ROWS);
+        for (var i = 0; i < ROWS; i++) {
+          board[i] = new Array(COLS);
+        }
+
+        canvas = document.getElementById("game-canvas");
+        ctx = canvas.getContext("2d");
+
+        // Generate the initial board
+        generateBoard();
+      }
+
+      // Generate a random board
+      function generateBoard() {
+        for (var i = 0; i < ROWS; i++) {
+          for (var j = 0; j < COLS; j++) {
+            board[i][j] = Math.round(Math.random());
+          }
+        }
+        drawBoard();
+      }
+
+      // Draw the board on the canvas
+      function drawBoard() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < ROWS; i++) {
+          for (var j = 0; j < COLS; j++) {
+            if (board[i][j]) {
+              ctx.fillStyle = "#1f77b4";
+            } else {
+              ctx.fillStyle = "#FFFFFF";
+            }
+            ctx.fillRect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          }
+        }
+      }
+
+      // Update the board based on Conway's rules
+      function updateBoard() {
+        var newBoard = new Array(ROWS);
+        for (var i = 0; i < ROWS; i++) {
+          newBoard[i] = new Array(COLS);
+        }
+        for (var i = 0; i < ROWS; i++) {
+          for (var j = 0; j < COLS; j++) {
+            var neighbors = 0;
+            for (var k = -1; k <= 1; k++) {
+              for (var l = -1; l <= 1; l++) {
+                if (k === 0 && l === 0) {
+                  continue;
+                }
+                var x = j + l;
+                var y = i + k;
+                if (x < 0 || y < 0 || x >= COLS || y >= ROWS) {
+                  continue;
+                }
+                if (board[y][x]) {
+                  neighbors++;
+                }
+              }
+            }
+            if (board[i][j]) {
+              if (neighbors === 2 || neighbors === 3) {
+                newBoard[i][j] = 1;
+              } else {
+                newBoard[i][j] = 0;
+              }
+            } else {
+              if (neighbors === 3) {
+                newBoard[i][j] = 1;
+              } else {
+                newBoard[i][j] = 0;
+              }
+            }
+          }
+        }
+        board = newBoard;
+        drawBoard();
+      }
+
+      // Start the game
+      function startGame() {
+        gameInterval = setInterval(updateBoard, 100);
+      }
+
+      // Stop the game
+      function stopGame() {
+        clearInterval(gameInterval);
+      }
+
+      // Add event listener to the canvas element
+      canvas.addEventListener("click", function (e) {
+        var x = e.offsetX;
+        var y = e.offsetY;
+        var i = Math.floor(y / CELL_SIZE);
+        var j = Math.floor(x / CELL_SIZE);
+        board[i][j] = !board[i][j];
+        drawBoard();
+      });
+    </script>
+  </head>
+  <body onload="init()">
+    <canvas id="game-canvas" width="500" height="500"></canvas>
+    <div id="controls">
+      <input type="button" class="button" value="Start" onclick="startGame()" />
+      <input type="button" class="button" value="Stop" onclick="stopGame()" />
+      <input type="button" class="button" value="Generate" onclick="generateBoard()" />
+    </div>
+  </body>
+</html>

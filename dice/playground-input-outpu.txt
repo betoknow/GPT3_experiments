@@ -1,0 +1,53 @@
+Write a Web-App wich shows a dice changing values every time someone click on it.
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#dice {
+  width: 200px;
+  height: 200px;
+  background-image: url('dice1.png');
+}
+</style>
+<script>
+function rollDice(){
+  // generate random number between 1 - 6
+  var randomDice = Math.floor(Math.random() * 6) + 1;
+  var diceName;
+  
+  // set the dice name
+  switch (randomDice){
+    case 1:
+      diceName = "dice1.png";
+      break;
+    case 2:
+      diceName = "dice2.png";
+      break;
+    case 3:
+      diceName = "dice3.png";
+      break;
+    case 4:
+      diceName = "dice4.png";
+      break;
+    case 5:
+      diceName = "dice5.png";
+      break;
+    case 6:
+      diceName = "dice6.png";
+      break;
+  }
+  
+  // change the source of the image
+  document.getElementById("dice").src = diceName;
+}
+</script>
+</head>
+<body>
+
+<h1>Click the dice to roll</h1>
+
+<img id="dice" src="dice1.png" onclick="rollDice()">
+
+</body>
+</html>
