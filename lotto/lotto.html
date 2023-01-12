@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lotto Generator</title>
+    <script>
+        let numbers = [];
+
+        // Funktion, um die Zahlen zu generieren
+        function generateNumbers() {
+            let counter = 0;
+            while (counter < 7) {
+                let num = Math.floor(Math.random() * (1 + 49) + 1);
+                if (numbers.includes(num)) {
+                    continue;
+                }
+                numbers.push(num);
+                counter++;
+            }
+        }
+
+        // Funktion, um die Zahlen in einer 7x7-Matrix darzustellen.
+        function displayMatrix() {
+            let matrix = document.getElementById("matrix");
+            let matrixHTML = "";
+
+            // Erstellen der Tabellenüberschrift
+            matrixHTML += "<table><tr>";
+            for (let col = 0; col < 7; col++) {
+                matrixHTML += "<th>" + (col + 1) + "</th>";
+            }
+            matrixHTML += "</tr>";
+
+            // Erstellen der Zellen
+            for (let row = 0; row < 7; row++) {
+                matrixHTML += "<tr>";
+                for (let col = 0; col < 7; col++) {
+                    let cellNum = (col + 1) + (7 * row);
+                    let cellValue = "";
+                    if (numbers.includes(cellNum)) {
+                        cellValue = "<td class='selected'>" + cellNum + "</td>";
+                    } else {
+                        cellValue = "<td>" + cellNum + "</td>";
+                    }
+                    matrixHTML += cellValue;
+                }
+                matrixHTML += "</tr>";
+            }
+            matrixHTML += "</table>";
+            matrix.innerHTML = matrixHTML;
+        }
+
+        // Funktion, die beim Laden der Seite aufgerufen wird.
+        window.onload = function() {
+            generateNumbers();
+            displayMatrix();
+        }
+    </script>
+    <style>
+        td.selected {
+            background-color: yellow;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Lotto Generator</h1>
+    <div id="matrix"></div>
+</body>
+
+</html>

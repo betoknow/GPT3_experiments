@@ -1,4 +1,4 @@
-Write a Web-App wich shows a dice changing values every time someone click on it.
+Write a Web-App which shows a dice changing values every time someone clicks on it.
 
 <!DOCTYPE html>
 <html>

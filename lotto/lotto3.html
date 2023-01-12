@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lotto Generator</title>
+    <script>
+        let numbers = [];
+        let extraNumber = 0;
+
+        // Funktion, um die Zahlen zu generieren
+        function generateNumbers() {
+            numbers = [];
+            let counter = 0;
+            while (counter < 6) {
+                let num = Math.floor(Math.random() * (1 + 49) + 1);
+                if (numbers.includes(num)) {
+                    continue;
+                }
+                numbers.push(num);
+                counter++;
+            }
+
+            // Generiere die Zusatzzahl
+            extraNumber = Math.floor(Math.random() * (1 + 49) + 1);
+            while (numbers.includes(extraNumber)) {
+                extraNumber = Math.floor(Math.random() * (1 + 49) + 1);
+            }
+            displayMatrix();
+        }
+
+        // Funktion, um die Zahlen in einer 7x7-Matrix darzustellen.
+        function displayMatrix() {
+            let matrix = document.getElementById("matrix");
+            let matrixHTML = "";
+
+            // Erstellen der Tabellenüberschrift
+            matrixHTML += "<table><tr>";
+
+            matrixHTML += "</tr>";
+
+            // Erstellen der Zellen
+            for (let row = 0; row < 7; row++) {
+                matrixHTML += "<tr>";
+                for (let col = 0; col < 7; col++) {
+                    let cellNum = (col + 1) + (7 * row);
+                    let cellValue = "";
+                    if (numbers.includes(cellNum)) {
+                        cellValue = "<td class='selected'>" + cellNum + "</td>";
+                    } else if (extraNumber === cellNum) {
+                        cellValue = "<td class='extra'>" + cellNum + "</td>";
+                    } else {
+                        cellValue = "<td>" + cellNum + "</td>";
+                    }
+                    matrixHTML += cellValue;
+                }
+                matrixHTML += "</tr>";
+            }
+            matrixHTML += "</table>";
+            matrix.innerHTML = matrixHTML;
+        }
+
+        // Funktion, die beim Laden der Seite aufgerufen wird.
+        window.onload = function() {
+            generateNumbers();
+            displayMatrix();
+        }
+    </script>
+    <style>
+        td.selected {
+            background-color: yellow;
+        }
+        
+        td.extra {
+            background-color: green;
+        }
+        
+        #matrix {
+            margin-top: 50px;
+        }
+        
+        #generate-btn {
+            padding: 10px;
+            background-color: #3c3c3c;
+            color: white;
+            border: 2px solid #3c3c3c;
+            border-radius: 10px;
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 50px;
+        }
+        
+        #generate-btn:hover {
+            background-color: white;
+            color: #3c3c3c;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Lotto Generator</h1>
+    <button id="generate-btn" onclick="generateNumbers()">Neu Generieren</button>
+    <div id="matrix"></div>
+</body>
+
+</html>
