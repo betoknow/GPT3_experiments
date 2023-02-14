@@ -1,0 +1,12 @@
+>>> 10 - ceil(log(50)/log(2))
+4
+>>> exp = 10 - ceil(log(50)/log(2))
+KeyboardInterrupt
+>>> z =50
+>>> exp = 10 - ceil(log(z)/log(2))
+>>> print(exp)
+4
+>>> z =0.05
+>>> exp = 10 - ceil(log(z)/log(2))
+>>> print(exp)
+14

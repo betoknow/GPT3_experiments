@@ -1,0 +1,36 @@
+<html>
+	<head>
+		<title>PMBUS LINEAR11 Conversion</title>
+	</head>
+	<body>
+		<div class="container">
+			<h2>PMBUS LINEAR11 Conversion</h2>
+			<p>Please enter a number to be converted to PMBUS LINEAR11 format:</p>
+			<input type="text" id="inputNumber" name="inputNumber" placeholder="Enter a number">
+			<div id="outputNumber"></div>
+		</div>
+	</body>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script>
+		// Function to convert input number to PMBUS LINEAR11 format
+		function toPMBUSLinear11(inputNumber) {
+			// Calculate the required parameters
+			let mantissa = Math.floor(inputNumber * 0.1220703125); // divide input number by 8192
+			let exponent = Math.floor(Math.log2(inputNumber));  // divide input number by 2^exponent
+			
+			// Calculate the PMBUS LINEAR11 format
+			let linear11 = (mantissa & 0xFFF) | ((exponent & 0xF) << 12);
+			
+			return linear11;
+		}
+
+		// Update output field with result from toPMBUSLinear11()
+		$(document).ready(function(){
+			$('#inputNumber').keyup(function(){
+				let inputNumber = $(this).val();
+				let outputNumber = toPMBUSLinear11(inputNumber);
+				$('#outputNumber').html('PMBUS LINEAR11 Format: ' + outputNumber);
+			});
+		});
+	</script>
+</html>
