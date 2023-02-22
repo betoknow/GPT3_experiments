@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<title>PMBUS LINEAR11 Conversion</title>
+		<style>
+			.container {
+				margin: auto;
+				width: 500px;
+				border: 1px solid #ccc;
+				padding: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h2>PMBUS LINEAR11 Conversion</h2>
+			<p>Please enter a number to be converted to PMBUS LINEAR11 format:</p>
+			<input type="text" id="inputNumber" name="inputNumber" placeholder="Enter a number">
+			<p id="outputNumber"></p>
+		</div>
+	</body>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script>
+		// Function to convert input number to PMBUS LINEAR11 format
+		function toPMBUSLinear11(inputNumber) {
+			// Calculate the required parameters
+			let x;
+			let N;
+			for (N = -10; N < 10; N++) {
+				x = Math.trunc(Math.abs(inputNumber) * Math.pow(2, N));
+				if (x >= Math.pow(2, 8)) {
+					break;
+				}
+			}
+			if (inputNumber < 0) {
+				x = -x;
+			}
+			let v = ((-N << 11) | (x & 0x3FF)) & 0xFFFF;
+			// Calculate the PMBUS LINEAR11 format
+			let linear11 = ("00" + (v & 0xFF).toString(16)).slice(-2) + ("00" + ((v >> 8) & 0xFF).toString(16)).slice(-2);
+			return linear11;
+			}
+		// Update output field with result from toPMBUSLinear11()
+		$(document).ready(function(){
+			$('#inputNumber').keyup(function(){
+				let inputNumber = $(this).val();
+				let outputNumber = toPMBUSLinear11(inputNumber);
+				let outputNumberHex = outputNumber.toString(16);
+				let outputBytes = outputNumberHex.substr(0,2) + ' ' + outputNumberHex.substr(2);
+				$('#outputNumber').html('PMBUS LINEAR11 Format bytes low/high: ' + outputBytes);
+			});
+		});
+	</script>
+</html>
