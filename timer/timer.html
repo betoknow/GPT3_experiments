@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Countdown Timer</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .timer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            width: 100vw;
+            height: 100vh;
+            box-sizing: border-box;
+            padding: 2rem;
+            background-color: #ffffff;
+        }
+
+        input {
+            font-size: 20vw;
+            text-align: center;
+            border: none;
+            background-color: transparent;
+            outline: none;
+            width: 100%;
+            margin: 0;
+        }
+
+        #controls {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+
+        button {
+            padding: 1rem 2rem;
+            font-size: 2vw;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            margin-top: 2rem;
+        }
+
+        button:active {
+            background-color: #0056b3;
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        label {
+            align-self: center;
+            font-size: 2vw;
+        }
+    </style>
+</head>
+<body>
+    <div class="timer-container">
+        <input id="timer" type="text" value="15:00" readonly>
+        <div id="controls">
+            <button id="start">Start</button>
+            <label for="cyclic"><input id="cyclic" type="checkbox" checked> Zyklisch</label>
+        </div>
+    </div>
+    <audio id="beep" src="beep.mp3" type="audio/mpeg"></audio>
+    <script>
+        var timerInput = document.getElementById('timer');
+        var startStopButton = document.getElementById('start');
+        var cyclicCheckbox = document.getElementById('cyclic');
+        var beep = document.getElementById('beep');
+
+        var defaultTime = 15 * 60;
+        var currentTime = defaultTime;
+        var timer;
+        var isRunning = false;
+
+        function formatTime(seconds) {
+            var mins = Math.floor(seconds / 60);
+            var secs = seconds % 60;
+            
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateDisplay() {
+            timerInput.value = formatTime(currentTime);
+        }
+
+        function countdown() {
+            currentTime--;
+            
+            if(currentTime < 0) {
+                showNotification();
+                for(let i = 0; i < 3; i++) {
+                    setTimeout(() => beep.play(), i * 1000);
+                }
+                if(cyclicCheckbox.checked) {
+                    currentTime = defaultTime;
+                } else {
+                    clearInterval(timer);
+                    startStopButton.textContent = "Start";
+                    isRunning = false;
+                    timerInput.readOnly = false;
+                }
+            }
+            
+            updateDisplay();
+        }
+
+        function showNotification() {
+            if (Notification.permission === "granted") {
+                new Notification("Aufstehen du fauler Sack!");
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        new Notification("Timer Alert");
+                    }
+                });
+            }
+        } 
+        
+        timerInput.addEventListener('click', () => {
+            if (!isRunning) {
+                timerInput.readOnly = false;
+            }
+        });
+
+        timerInput.addEventListener('change', () => {
+            let timeParts = timerInput.value.split(':');
+            defaultTime = (+timeParts[0] * 60) + (+timeParts[1]);
+            timerInput.readOnly = true;
+            currentTime = defaultTime;
+            updateDisplay();
+        });
+
+        startStopButton.addEventListener('click', () => {
+            if (!isRunning) {
+                timer = setInterval(countdown, 1000);
+                startStopButton.textContent = "Stop";
+                isRunning = true;
+                timerInput.readOnly = true;
+            } else {
+                clearInterval(timer);
+                startStopButton.textContent = "Start";
+                isRunning = false;
+                timerInput.readOnly = false;
+            }
+        });
+
+        // Berechtigung für Benachrichtigungen anfordern
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
+
