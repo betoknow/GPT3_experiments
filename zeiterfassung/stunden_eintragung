@@ -1,0 +1,32 @@
+import tabula
+import pandas as pd
+
+# Read PDF file
+file_path = "zeiterfassung-04.pdf"
+tables = tabula.read_pdf(file_path, pages="all", multiple_tables=True, pandas_options={"header": None})
+print(tables)
+
+# Concatenate tables
+table = pd.concat(tables)
+
+# Find the "Arbeits-" column index
+arbeitszeit_index = None
+for idx, row in table.iterrows():
+    arbeitszeit_index = row.where(row.str.contains("Arbeits-", case=False, na=False)).dropna().index
+    if len(arbeitszeit_index) > 0:
+        arbeitszeit_index = arbeitszeit_index[0]
+        break
+
+if arbeitszeit_index is None:
+    raise ValueError("Arbeits- column not found")
+
+# Rename columns and keep only "Arbeits-" column
+table.columns = table.iloc[idx]
+arbeitszeit = table[[table.columns[0], table.columns[arbeitszeit_index]]].copy()
+arbeitszeit.columns = ["Date", "Arbeitszeit"]
+
+# Filter rows with valid dates
+arbeitszeit = arbeitszeit[pd.to_datetime(arbeitszeit["Date"], format="%a %d.%m.", errors="coerce").notna()]
+
+# Save to CSV
+arbeitszeit.to_csv("arbeitszeit.csv", index=False)

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stock Market Tracker</title>
+  <style>
+    canvas{
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div style="width:75%;">
+    <canvas id="canvas"></canvas>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
+  <script>
+    var config = {
+      type: 'line',
+      data: {
+        datasets: []
+      },
+      options: {
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'day'
+            }
+          },
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    };
+
+    function fetchStockData(symbol, apiKey) {
+      var url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&outputsize=full&apikey=${apiKey}`;
+      var corsProxy = 'https://cors-anywhere.herokuapp.com/';
+
+      return fetch(corsProxy + url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log(data);
+          var timeSeries = data['Time Series (Daily)'];
+          return Object.entries(timeSeries).map(([date, value]) => {
+            return {x: moment(date), y: value['4. close']};
+          });
+        })
+        .catch(error => {
+          console.error('There has been a problem with your fetch operation:', error);
+        });
+    }
+
+    window.onload = function() {
+      var ctx = document.getElementById('canvas').getContext('2d');
+      window.myLine = new Chart(ctx, config);
+      var symbols = ['AAPL', 'MSFT'];  // replace with the stock symbols you want to track
+      var apiKey = '2AKGMKLUTFVCMC8V';  // replace with your Alpha Vantage API key
+
+      var fetchInterval = 61000 * symbols.length;  // 1 minute per symbol plus a 1 second buffer
+      symbols.forEach((symbol, index) => {
+        setTimeout(() => {
+          fetchStockData(symbol, apiKey).then(data => {
+            var color = '#' + Math.floor(Math.random()*16777215).toString(16);  // generate a random color
+            config.data.datasets.push({
+              label: symbol,
+              borderColor: color,
+              backgroundColor: color,
+              data: data,
+              fill: false,
+            });
+            window.myLine.update();
+          });
+        }, index * fetchInterval);
+      });
+    };
+  </script>
+</body>
+</html>

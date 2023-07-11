@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redfish API WebApp</title>
+</head>
+<body>
+    <h1>Redfish API WebApp</h1>
+    <form id="apiForm">
+        <label for="clientIp">Client IP:</label>
+        <input type="text" id="clientIp" required>
+        <br>
+        <label for="username">Username:</label>
+        <input type="text" id="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" required>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+    <br>
+    <button id="getRequest">GET Request</button>
+    <button id="postRequest">POST Request</button>
+    <button id="patchRequest">PATCH Request</button>
+    <br>
+    <pre id="response"></pre>
+
+    <script>
+        document.getElementById('apiForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+        });
+
+        function getAuthHeader(username, password) {
+            return 'Basic ' + btoa(username + ':' + password);
+        }
+
+        async function sendRequest(method) {
+            const clientIp = document.getElementById('clientIp').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const url = `https://${clientIp}/redfish/v1/`; // Modify the URL according to your API endpoint
+            const authHeader = getAuthHeader(username, password);
+
+            const requestOptions = {
+                method: method,
+                headers: {
+                    'Authorization': authHeader,
+                },
+            };
+
+            if (method === 'POST' || method === 'PATCH') {
+                requestOptions.headers['Content-Type'] = 'application/json';
+                requestOptions.body = JSON.stringify({}); // Add your request payload here
+            }
+
+            try {
+                const response = await fetch(url, requestOptions);
+                const data = await response.json();
+                document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('response').textContent = 'Error: ' + error;
+            }
+        }
+
+        document.getElementById('getRequest').addEventListener('click', () => sendRequest('GET'));
+        document.getElementById('postRequest').addEventListener('click', () => sendRequest('POST'));
+        document.getElementById('patchRequest').addEventListener('click', () => sendRequest('PATCH'));
+    </script>
+</body>
+</html>
