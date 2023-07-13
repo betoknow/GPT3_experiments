@@ -69,7 +69,7 @@
 </head>
 <body>
     <div class="timer-container">
-        <input id="timer" type="text" value="15:00" readonly>
+        <input id="timer" type="text" value="20:00" readonly>
         <div id="controls">
             <button id="start">Start</button>
             <label for="cyclic"><input id="cyclic" type="checkbox" checked> Zyklisch</label>
@@ -82,7 +82,7 @@
         var cyclicCheckbox = document.getElementById('cyclic');
         var beep = document.getElementById('beep');
 
-        var defaultTime = 15 * 60;
+        var defaultTime = 20 * 60;
         var currentTime = defaultTime;
         var timer;
         var isRunning = false;
